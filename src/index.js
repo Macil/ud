@@ -10,7 +10,7 @@ export function markReloadable(module: typeof module) {
   }
 }
 
-export function defonce<T>(module: typeof module, fn: ()=>T, key:string='-default-once'): T {
+export function defonce<T>(module: typeof module, fn: ()=>T, key?:string=''): T {
   markReloadable(module);
   var usedKeys = moduleUsedUdKeys.get(module);
   if (!usedKeys) {
@@ -41,8 +41,8 @@ export function defonce<T>(module: typeof module, fn: ()=>T, key:string='-defaul
   return value;
 }
 
-export function defobj<T: Object>(module: typeof module, object: T, key:string='-default-obj'): T {
-  var sharedObject = defonce(module, ()=>object, key);
+export function defobj<T: Object>(module: typeof module, object: T, key?:string=''): T {
+  var sharedObject = defonce(module, ()=>object, '--defobj-'+key);
   if (sharedObject !== object) {
     Object.defineProperties(
       sharedObject,
@@ -58,8 +58,8 @@ export function defobj<T: Object>(module: typeof module, object: T, key:string='
   return sharedObject;
 }
 
-export function defn<T: Function>(module: typeof module, fn: T): T {
-  var updatable = defobj(module, {fn}, '-fn-'+fn.name);
+export function defn<T: Function>(module: typeof module, fn: T, key?:string=''): T {
+  var updatable = defobj(module, {fn}, '--defn-'+key);
   if ((module:any).hot) {
     var paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
     var wrappedFn: any = new Function(
@@ -81,7 +81,7 @@ export function defn<T: Function>(module: typeof module, fn: T): T {
       `
     )(updatable);
 
-    var updatableProto = defobj(module, fn.prototype, '-fn-proto-'+fn.name);
+    var updatableProto = defobj(module, fn.prototype, '--defn-proto-'+key);
     wrappedFn.prototype = updatable.fn.prototype = updatableProto;
     return wrappedFn;
   }

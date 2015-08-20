@@ -14,8 +14,8 @@ pass-throughs.
 ## API
 
 All of ud's functions require a reference to your local `module` object to be
-passed in, and an optional key. Each of the functions can only be used once per
-module with a given key.
+passed in, and take an optional key. Each of the functions can only be used
+once per module with a given key.
 
 ### ud.defonce(module, function, key?)
 
@@ -30,15 +30,14 @@ On the first run, the object will be returned. On a reload, the original object
 will be updated to have all of the values of the newest object and then will be
 returned.
 
-### ud.defn(module, function)
+### ud.defn(module, function, key?)
 
 A wrapper around the function will be returned which calls the given function.
 On a reload, the wrapper will be updated so that it calls the most recent
 version of the function.
 
 The prototype of the function will be updated too, so you can pass a class
-constructor to defn and have its methods be kept up to date. The function name
-is used as the key.
+constructor to defn and have its methods be kept up to date.
 
 ## Example
 
@@ -48,7 +47,7 @@ var ud = require('ud');
 
 var shared = ud.defonce(module, _.constant({counter: 0}));
 
-var inc = ud.defn(module, function inc() {
+var inc = ud.defn(module, function() {
   shared.counter += 1;
   console.log('counter', shared.counter);
 });
@@ -68,7 +67,9 @@ would not be updated.
 Full [Flow Type](http://flowtype.org/) declarations for this module are
 included. These must be manually enabled to use because Flow [doesn't allow
 modules to automatically include their own
-declarations](https://github.com/facebook/flow/issues/593) yet.
+declarations](https://github.com/facebook/flow/issues/593) yet. The module must
+also be added to the [ignore] section because of [this
+bug](https://github.com/facebook/flow/issues/676).
 Add these lines to your `.flowconfig` to enable them:
 
 ```
