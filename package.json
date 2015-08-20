@@ -1,0 +1,36 @@
+{
+  "name": "ud",
+  "version": "1.0.0",
+  "description": "Utilities for updating code live with hot module replacement",
+  "main": "js/index.js",
+  "scripts": {
+    "prepublish": "babel -s inline --optional runtime -d js/ src/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AgentME/ud.git"
+  },
+  "keywords": [
+    "hmr",
+    "reload",
+    "hot",
+    "edit",
+    "live",
+    "livereload"
+  ],
+  "author": "Chris Cowan <agentme49@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AgentME/ud/issues"
+  },
+  "homepage": "https://github.com/AgentME/ud#readme",
+  "dependencies": {
+    "babel-runtime": "^5.8.20",
+    "lodash": "^3.10.1"
+  },
+  "devDependencies": {
+    "babel": "^5.8.21",
+    "mocha": "^2.2.5"
+  }
+}
