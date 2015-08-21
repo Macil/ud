@@ -60,9 +60,9 @@ export function defobj<T: Object>(module: typeof module, object: T, key?:string=
 
 export function defn<T: Function>(module: typeof module, fn: T, key?:string=''): T {
   var shared = defonce(module, ()=>{
-    var shared = {fn: null, wrapper: null};
+    var shared: Object = {fn: null, wrapper: null};
     if (!(module:any).hot) {
-      shared.wrapper = fn;
+      return {fn: null, wrapper: fn};
     } else {
       var paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
       shared.wrapper = new Function(
@@ -73,8 +73,8 @@ export function defn<T: Function>(module: typeof module, fn: T, key?:string=''):
         };
         `
       )(shared);
-      shared.wrapper.prototype = fn.prototype;
-      shared.wrapper.prototype.constructor = shared.wrapper;
+      (shared.wrapper:any).prototype = fn.prototype;
+      (shared.wrapper:any).prototype.constructor = shared.wrapper;
     }
     return shared;
   }, '--defn-shared-'+key);
