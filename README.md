@@ -79,3 +79,9 @@ Add these lines to your `.flowconfig` to enable them:
 [libs]
 node_modules/ud/flow-lib.js
 ```
+
+## See Also
+
+* [ud-kefir](https://github.com/AgentME/ud-kefir), a companion library which
+  integrates with [Kefir](https://rpominov.github.io/kefir/) and emits events
+  when reloads happen.
