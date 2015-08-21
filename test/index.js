@@ -20,12 +20,31 @@ describe("ud", function() {
       ud.markReloadable(_module);
       assert(_module.hot.accept.calledOnce);
     });
+
     it("does nothing if module.hot isn't available", function() {
       ud.markReloadable(({}:any));
     });
   });
 
   describe("defonce", function() {
+    it("works if no module.hot", function() {
+      var obj = {};
+      assert.strictEqual(ud.defonce(({}:any), ()=>obj), obj);
+    });
+
+    it("throws same module and key used multiple times", function() {
+      var _module: any = {};
+      ud.defonce(_module, ()=>1);
+      assert.throws(()=>{
+        ud.defonce(_module, ()=>2);
+      }, 'ud functions can only be used once per module with a given key');
+
+      ud.defonce(_module, ()=>3, 'foo');
+      assert.throws(()=>{
+        ud.defonce(_module, ()=>4, 'foo');
+      }, 'ud functions can only be used once per module with a given key');
+    });
+
     it("works over two reloads", function() {
       var _module1: any = {
         hot: {
@@ -73,6 +92,11 @@ describe("ud", function() {
   });
 
   describe("defobj", function() {
+    it("works if no module.hot", function() {
+      var obj = {};
+      assert.strictEqual(ud.defobj(({}:any), obj), obj);
+    });
+
     it("works", function() {
       var _module1: any = {
         hot: {
@@ -105,6 +129,17 @@ describe("ud", function() {
   });
 
   describe("defn", function() {
+    it("works if no module.hot", function() {
+      var fn = ()=>5;
+      assert.strictEqual(ud.defn(({}:any), fn), fn);
+
+      class C {}
+      var Cproto = C.prototype;
+      assert.strictEqual(ud.defn(({}:any), C), C);
+      assert.strictEqual(C.prototype, Cproto);
+      assert.strictEqual(C.prototype.constructor, C);
+    });
+
     it("works on basic functions", function() {
       var _module1: any = {
         hot: {
@@ -228,17 +263,6 @@ describe("ud", function() {
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'baz');
       assert.strictEqual((c1:any).bar(), 'bar');
-    });
-
-    it("passes fn through if no module.hot", function() {
-      var fn = ()=>5;
-      assert.strictEqual(ud.defn(({}:any), fn), fn);
-
-      class C {}
-      var Cproto = C.prototype;
-      assert.strictEqual(ud.defn(({}:any), C), C);
-      assert.strictEqual(C.prototype, Cproto);
-      assert.strictEqual(C.prototype.constructor, C);
     });
   });
 });
