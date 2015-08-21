@@ -32,7 +32,7 @@ describe("ud", function() {
       assert.strictEqual(ud.defonce(({}:any), ()=>obj), obj);
     });
 
-    it("throws same module and key used multiple times", function() {
+    it("throws if same module and key used multiple times", function() {
       var _module: any = {};
       ud.defonce(_module, ()=>1);
       assert.throws(()=>{
