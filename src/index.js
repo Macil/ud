@@ -80,8 +80,13 @@ export function defn<T: Function>(module: typeof module, fn: T, key?:string=''):
   }, '--defn-shared-'+key);
   shared.fn = fn;
   if ((module:any).hot) {
+    var newSuperProto = Object.getPrototypeOf(fn.prototype);
     fn.prototype = defobj(module, fn.prototype, '--defn-proto-'+key);
     fn.prototype.constructor = shared.wrapper;
+    if (Object.getPrototypeOf(fn.prototype) !== newSuperProto) {
+      // Hide this line from Flow because it doesn't know setPrototypeOf.
+      /*::`*/ Object.setPrototypeOf(fn.prototype, newSuperProto); /*::`;*/
+    }
   }
   return shared.wrapper;
 }

@@ -35,12 +35,12 @@ describe("ud", function() {
     it("throws if same module and key used multiple times", function() {
       var _module: any = {};
       ud.defonce(_module, ()=>1);
-      assert.throws(()=>{
+      (assert:any).throws(()=>{
         ud.defonce(_module, ()=>2);
       }, 'ud functions can only be used once per module with a given key');
 
       ud.defonce(_module, ()=>3, 'foo');
-      assert.throws(()=>{
+      (assert:any).throws(()=>{
         ud.defonce(_module, ()=>4, 'foo');
       }, 'ud functions can only be used once per module with a given key');
     });
@@ -263,6 +263,148 @@ describe("ud", function() {
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'baz');
       assert.strictEqual((c1:any).bar(), 'bar');
+    });
+
+    it("can change a class's superclass", function() {
+      var _module1: any = {
+        hot: {
+          data: null,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      class S1 {
+        s: number;
+        constructor() {
+          this.s = 1;
+        }
+        calls() {
+          return 1;
+        }
+      }
+      var C = ud.defn(_module1, class C extends S1 {
+        c: number;
+        constructor() {
+          super();
+          this.c = 1;
+        }
+        callc() {
+          return 1;
+        }
+      });
+      var c1 = new C();
+      assert(c1 instanceof C);
+      assert(c1 instanceof S1);
+      assert.strictEqual(c1.s, 1);
+      assert.strictEqual(c1.calls(), 1);
+      assert.strictEqual(c1.c, 1);
+      assert.strictEqual(c1.callc(), 1);
+
+      var hotData1 = {};
+      _module1.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData1);
+      });
+      _module1 = null;
+
+      var _module2: any = {
+        hot: {
+          data: hotData1,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      class S2 {
+        s: number;
+        constructor() {
+          this.s = 2;
+        }
+        calls() {
+          return 2;
+        }
+      }
+      assert.strictEqual(ud.defn(_module2, class C extends S2 {
+        c: number;
+        constructor() {
+          super();
+          this.c = 2;
+        }
+        callc() {
+          return 2;
+        }
+      }), C);
+      var c2 = new C();
+      assert(c2 instanceof C);
+      assert(c2 instanceof S2);
+      assert(!(c2 instanceof S1));
+      assert.strictEqual(c2.s, 2);
+      assert.strictEqual(c2.calls(), 2);
+      assert.strictEqual(c2.c, 2);
+      assert.strictEqual(c2.callc(), 2);
+      assert(c1 instanceof C);
+      assert(c1 instanceof S2);
+      assert(!(c1 instanceof S1));
+      assert.strictEqual(c1.s, 1);
+      assert.strictEqual(c1.calls(), 2);
+      assert.strictEqual(c1.c, 1);
+      assert.strictEqual(c1.callc(), 2);
+
+      var hotData2 = {};
+      _module2.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData2);
+      });
+      _module2 = null;
+
+      var _module3: any = {
+        hot: {
+          data: hotData2,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      class S3 {
+        s: number;
+        constructor() {
+          this.s = 3;
+        }
+        calls() {
+          return 3;
+        }
+      }
+      assert.strictEqual(ud.defn(_module3, class C extends S3 {
+        c: number;
+        constructor() {
+          super();
+          this.c = 3;
+        }
+        callc() {
+          return 3;
+        }
+      }), C);
+      var c3 = new C();
+      assert(c3 instanceof C);
+      assert(c3 instanceof S3);
+      assert(!(c3 instanceof S2));
+      assert(!(c3 instanceof S1));
+      assert.strictEqual(c3.s, 3);
+      assert.strictEqual(c3.calls(), 3);
+      assert.strictEqual(c3.c, 3);
+      assert.strictEqual(c3.callc(), 3);
+      assert(c2 instanceof C);
+      assert(c2 instanceof S3);
+      assert(!(c2 instanceof S2));
+      assert(!(c2 instanceof S1));
+      assert.strictEqual(c2.s, 2);
+      assert.strictEqual(c2.calls(), 3);
+      assert.strictEqual(c2.c, 2);
+      assert.strictEqual(c2.callc(), 3);
+      assert(c1 instanceof C);
+      assert(c1 instanceof S3);
+      assert(!(c1 instanceof S2));
+      assert(!(c1 instanceof S1));
+      assert.strictEqual(c1.s, 1);
+      assert.strictEqual(c1.calls(), 3);
+      assert.strictEqual(c1.c, 1);
+      assert.strictEqual(c1.callc(), 3);
     });
   });
 });
