@@ -113,8 +113,8 @@ describe("ud", function() {
           dispose: sinon.spy()
         }
       };
-      var fn1 = ud.defn(_module1, ()=>5);
-      assert.strictEqual(fn1(), 5);
+      var fn = ud.defn(_module1, ()=>5);
+      assert.strictEqual(fn(), 5);
       assert(_module1.hot.accept.called);
 
       var hotData1 = {};
@@ -130,9 +130,8 @@ describe("ud", function() {
           dispose: sinon.spy()
         }
       };
-      var fn2 = ud.defn(_module2, ()=>6);
-      assert.strictEqual(fn1(), 6);
-      assert.strictEqual(fn2(), 6);
+      assert.strictEqual(ud.defn(_module2, ()=>6), fn);
+      assert.strictEqual(fn(), 6);
     });
 
     it("works on classes", function() {
@@ -143,7 +142,7 @@ describe("ud", function() {
           dispose: sinon.spy()
         }
       };
-      var C1 = ud.defn(_module1, class C1 {
+      var C = ud.defn(_module1, class C {
         x: number;
         constructor() {
           this.x = 1;
@@ -152,7 +151,10 @@ describe("ud", function() {
           return 'foo';
         }
       });
-      var c1 = new C1();
+      var Cfirstproto = C.prototype;
+      var c1 = new C();
+      assert.strictEqual(c1.constructor, C);
+      assert.strictEqual(Object.getPrototypeOf(c1), Cfirstproto);
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'foo');
       assert(_module1.hot.accept.called);
@@ -170,7 +172,7 @@ describe("ud", function() {
           dispose: sinon.spy()
         }
       };
-      var C2 = ud.defn(_module2, class C2 {
+      assert.strictEqual(ud.defn(_module2, class C {
         x: number;
         constructor() {
           this.x = 2;
@@ -178,15 +180,15 @@ describe("ud", function() {
         foo() {
           return 'bar';
         }
-      });
-      var c2 = new C2();
+      }), C);
+      assert.strictEqual(C.prototype, Cfirstproto);
+      var c2 = new C();
+      assert.strictEqual(c2.constructor, C);
+      assert.strictEqual(Object.getPrototypeOf(c2), Cfirstproto);
       assert.strictEqual(c2.x, 2);
       assert.strictEqual(c2.foo(), 'bar');
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'bar');
-      var c12 = new C1();
-      assert.strictEqual(c12.x, 2);
-      assert.strictEqual(c12.foo(), 'bar');
 
       var hotData2 = {};
       _module2.hot.dispose.getCalls().forEach(call => {
@@ -201,7 +203,7 @@ describe("ud", function() {
           dispose: sinon.spy()
         }
       };
-      var C3 = ud.defn(_module3, class C3 {
+      assert.strictEqual(ud.defn(_module3, class C {
         x: number;
         constructor() {
           this.x = 3;
@@ -209,22 +211,34 @@ describe("ud", function() {
         foo() {
           return 'baz';
         }
-      });
-      var c3 = new C3();
+        bar() {
+          return 'bar';
+        }
+      }), C);
+      assert.strictEqual(C.prototype, Cfirstproto);
+      var c3 = new C();
+      assert.strictEqual(c3.constructor, C);
+      assert.strictEqual(Object.getPrototypeOf(c3), Cfirstproto);
       assert.strictEqual(c3.x, 3);
       assert.strictEqual(c3.foo(), 'baz');
+      assert.strictEqual((c3:any).bar(), 'bar');
       assert.strictEqual(c2.x, 2);
       assert.strictEqual(c2.foo(), 'baz');
-      assert.strictEqual(c12.x, 2);
-      assert.strictEqual(c12.foo(), 'baz');
+      assert.strictEqual((c2:any).bar(), 'bar');
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'baz');
-      var c13 = new C1();
-      assert.strictEqual(c13.x, 3);
-      assert.strictEqual(c13.foo(), 'baz');
-      var c23 = new C2();
-      assert.strictEqual(c23.x, 3);
-      assert.strictEqual(c23.foo(), 'baz');
+      assert.strictEqual((c1:any).bar(), 'bar');
+    });
+
+    it("passes fn through if no module.hot", function() {
+      var fn = ()=>5;
+      assert.strictEqual(ud.defn(({}:any), fn), fn);
+
+      class C {}
+      var Cproto = C.prototype;
+      assert.strictEqual(ud.defn(({}:any), C), C);
+      assert.strictEqual(C.prototype, Cproto);
+      assert.strictEqual(C.prototype.constructor, C);
     });
   });
 });

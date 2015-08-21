@@ -59,31 +59,29 @@ export function defobj<T: Object>(module: typeof module, object: T, key?:string=
 }
 
 export function defn<T: Function>(module: typeof module, fn: T, key?:string=''): T {
-  var updatable = defobj(module, {fn}, '--defn-'+key);
+  var shared = defonce(module, ()=>{
+    var shared = {fn: null, wrapper: null};
+    if (!(module:any).hot) {
+      shared.wrapper = fn;
+    } else {
+      var paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
+      shared.wrapper = new Function(
+        'shared',
+        `
+        return function ${fn.name}__ud_wrapper(${paramsList}){
+          return shared.fn.apply(this, arguments);
+        };
+        `
+      )(shared);
+      shared.wrapper.prototype = fn.prototype;
+      shared.wrapper.prototype.constructor = shared.wrapper;
+    }
+    return shared;
+  }, '--defn-shared-'+key);
+  shared.fn = fn;
   if ((module:any).hot) {
-    var paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
-    var wrappedFn: any = new Function(
-      'updatable',
-      `
-      var wrapper = function ${fn.name}__ud_wrapper(${paramsList}){
-        if (this instanceof wrapper) {
-          var obj = Object.create(updatable.fn.prototype);
-          obj.constructor = wrapper;
-          var retval = updatable.fn.apply(obj, arguments);
-          if (typeof retval === 'object') {
-            obj = retval;
-          }
-          return obj;
-        }
-        return updatable.fn.apply(this, arguments);
-      };
-      return wrapper;
-      `
-    )(updatable);
-
-    var updatableProto = defobj(module, fn.prototype, '--defn-proto-'+key);
-    wrappedFn.prototype = updatable.fn.prototype = updatableProto;
-    return wrappedFn;
+    fn.prototype = defobj(module, fn.prototype, '--defn-proto-'+key);
+    fn.prototype.constructor = shared.wrapper;
   }
-  return fn;
+  return shared.wrapper;
 }
