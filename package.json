@@ -1,6 +1,6 @@
 {
   "name": "ud",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Utilities for updating code live with hot module replacement",
   "main": "js/index.js",
   "scripts": {
