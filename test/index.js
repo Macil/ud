@@ -185,6 +185,9 @@ describe("ud", function() {
         foo() {
           return 'foo';
         }
+        static sfoo() {
+          return 'foo';
+        }
       });
       var Cfirstproto = C.prototype;
       var c1 = new C();
@@ -192,6 +195,7 @@ describe("ud", function() {
       assert.strictEqual(Object.getPrototypeOf(c1), Cfirstproto);
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'foo');
+      assert.strictEqual(C.sfoo(), 'foo');
       assert(_module1.hot.accept.called);
 
       var hotData1 = {};
@@ -215,6 +219,9 @@ describe("ud", function() {
         foo() {
           return 'bar';
         }
+        static sfoo() {
+          return 'bar';
+        }
       }), C);
       assert.strictEqual(C.prototype, Cfirstproto);
       var c2 = new C();
@@ -224,6 +231,7 @@ describe("ud", function() {
       assert.strictEqual(c2.foo(), 'bar');
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'bar');
+      assert.strictEqual(C.sfoo(), 'bar');
 
       var hotData2 = {};
       _module2.hot.dispose.getCalls().forEach(call => {
@@ -249,6 +257,12 @@ describe("ud", function() {
         bar() {
           return 'bar';
         }
+        static sfoo() {
+          return 'baz';
+        }
+        static sbar() {
+          return 'baz';
+        }
       }), C);
       assert.strictEqual(C.prototype, Cfirstproto);
       var c3 = new C();
@@ -263,6 +277,8 @@ describe("ud", function() {
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'baz');
       assert.strictEqual((c1:any).bar(), 'bar');
+      assert.strictEqual(C.sfoo(), 'baz');
+      assert.strictEqual((C:any).sbar(), 'baz');
     });
 
     it("can change a class's superclass", function() {
@@ -281,6 +297,9 @@ describe("ud", function() {
         calls() {
           return 1;
         }
+        static scalls() {
+          return 1;
+        }
       }
       var C = ud.defn(_module1, class C extends S1 {
         c: number;
@@ -291,6 +310,9 @@ describe("ud", function() {
         callc() {
           return 1;
         }
+        static scallc() {
+          return 1;
+        }
       });
       var c1 = new C();
       assert(c1 instanceof C);
@@ -299,6 +321,8 @@ describe("ud", function() {
       assert.strictEqual(c1.calls(), 1);
       assert.strictEqual(c1.c, 1);
       assert.strictEqual(c1.callc(), 1);
+      assert.strictEqual(C.scalls(), 1);
+      assert.strictEqual(C.scallc(), 1);
 
       var hotData1 = {};
       _module1.hot.dispose.getCalls().forEach(call => {
@@ -321,6 +345,9 @@ describe("ud", function() {
         calls() {
           return 2;
         }
+        static scalls() {
+          return 2;
+        }
       }
       assert.strictEqual(ud.defn(_module2, class C extends S2 {
         c: number;
@@ -329,6 +356,9 @@ describe("ud", function() {
           this.c = 2;
         }
         callc() {
+          return 2;
+        }
+        static scallc() {
           return 2;
         }
       }), C);
@@ -347,6 +377,8 @@ describe("ud", function() {
       assert.strictEqual(c1.calls(), 2);
       assert.strictEqual(c1.c, 1);
       assert.strictEqual(c1.callc(), 2);
+      assert.strictEqual(C.scalls(), 2);
+      assert.strictEqual(C.scallc(), 2);
 
       var hotData2 = {};
       _module2.hot.dispose.getCalls().forEach(call => {
@@ -369,6 +401,9 @@ describe("ud", function() {
         calls() {
           return 3;
         }
+        static scalls() {
+          return 3;
+        }
       }
       assert.strictEqual(ud.defn(_module3, class C extends S3 {
         c: number;
@@ -377,6 +412,9 @@ describe("ud", function() {
           this.c = 3;
         }
         callc() {
+          return 3;
+        }
+        static scallc() {
           return 3;
         }
       }), C);
@@ -405,6 +443,8 @@ describe("ud", function() {
       assert.strictEqual(c1.calls(), 3);
       assert.strictEqual(c1.c, 1);
       assert.strictEqual(c1.callc(), 3);
+      assert.strictEqual(C.scalls(), 3);
+      assert.strictEqual(C.scallc(), 3);
     });
   });
 });

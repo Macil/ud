@@ -3,6 +3,7 @@
 
 var _ = require('lodash');
 var moduleUsedUdKeys: WeakMap<typeof module, Set<string>> = new WeakMap();
+var funcPropBlacklist = ['length', 'name', 'arguments', 'caller', 'prototype'];
 
 export function markReloadable(module: typeof module) {
   if ((module:any).hot) {
@@ -87,6 +88,21 @@ export function defn<T: Function>(module: typeof module, fn: T, key?:string=''):
       // Hide this line from Flow because it doesn't know setPrototypeOf.
       /*::`*/ Object.setPrototypeOf(fn.prototype, newSuperProto); /*::`;*/
     }
+    var newSuperFnProto = Object.getPrototypeOf(fn);
+    if (Object.getPrototypeOf(shared.wrapper) !== newSuperFnProto) {
+      /*::`*/ Object.setPrototypeOf(shared.wrapper, newSuperFnProto); /*::`;*/
+    }
+    Object.defineProperties(
+      shared.wrapper,
+      _.chain(Object.getOwnPropertyNames(fn))
+        .filter(name => !_.includes(funcPropBlacklist, name))
+        .map(name => [name, Object.getOwnPropertyDescriptor(fn, name)])
+        .map(([name, {value,enumerable}]) =>
+          [name, {value,enumerable,writable:true,configurable:true}]
+        )
+        .zipObject()
+        .value()
+    );
   }
   return shared.wrapper;
 }
