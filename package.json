@@ -4,7 +4,7 @@
   "description": "Utilities for updating code live with hot module replacement",
   "main": "js/index.js",
   "scripts": {
-    "prepublish": "babel -s inline --optional runtime -d js/ src/",
+    "prepublish": "babel -s inline -d js/ src/",
     "test": "mocha"
   },
   "repository": {
