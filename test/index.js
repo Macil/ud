@@ -9,6 +9,10 @@ function bomb() {
   throw new Error("Should not be called");
 }
 
+function has(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
 describe("ud", function() {
   describe("markReloadable", function() {
     it("calls module.hot.accept when available", function() {
@@ -105,8 +109,8 @@ describe("ud", function() {
           dispose: sinon.spy()
         }
       };
-      var obj = ud.defobj(_module1, {a:5});
-      assert.deepEqual(obj, {a:5});
+      var obj = ud.defobj(_module1, {a:5,c:10});
+      assert.deepEqual(obj, {a:5,c:10});
       assert(_module1.hot.accept.called);
 
       var hotData1 = {};
@@ -182,12 +186,10 @@ describe("ud", function() {
         constructor() {
           this.x = 1;
         }
-        foo() {
-          return 'foo';
-        }
-        static sfoo() {
-          return 'foo';
-        }
+        foo() {return 'foo';}
+        static sfoo() {return 'foo';}
+        one() {return 1;}
+        static one() {return 1.1;}
       });
       var Cfirstproto = C.prototype;
       var c1 = new C();
@@ -195,7 +197,9 @@ describe("ud", function() {
       assert.strictEqual(Object.getPrototypeOf(c1), Cfirstproto);
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'foo');
+      assert.strictEqual(c1.one(), 1);
       assert.strictEqual(C.sfoo(), 'foo');
+      assert.strictEqual(C.one(), 1.1);
       assert(_module1.hot.accept.called);
 
       var hotData1 = {};
@@ -216,12 +220,10 @@ describe("ud", function() {
         constructor() {
           this.x = 2;
         }
-        foo() {
-          return 'bar';
-        }
-        static sfoo() {
-          return 'bar';
-        }
+        foo() {return 'bar';}
+        static sfoo() {return 'bar';}
+        two() {return 2;}
+        static two() {return 2.1;}
       }), C);
       assert.strictEqual(C.prototype, Cfirstproto);
       var c2 = new C();
@@ -229,9 +231,15 @@ describe("ud", function() {
       assert.strictEqual(Object.getPrototypeOf(c2), Cfirstproto);
       assert.strictEqual(c2.x, 2);
       assert.strictEqual(c2.foo(), 'bar');
+      assert(!has(c2, 'one'));
+      assert.strictEqual((c2:any).two(), 2);
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'bar');
+      assert(!has(c1, 'one'));
+      assert.strictEqual((c1:any).two(), 2);
       assert.strictEqual(C.sfoo(), 'bar');
+      assert(!has(C, 'one'));
+      assert.strictEqual((C:any).two(), 2.1);
 
       var hotData2 = {};
       _module2.hot.dispose.getCalls().forEach(call => {
@@ -251,18 +259,10 @@ describe("ud", function() {
         constructor() {
           this.x = 3;
         }
-        foo() {
-          return 'baz';
-        }
-        bar() {
-          return 'bar';
-        }
-        static sfoo() {
-          return 'baz';
-        }
-        static sbar() {
-          return 'baz';
-        }
+        foo() {return 'baz';}
+        static sfoo() {return 'baz';}
+        three() {return 3;}
+        static three() {return 3.1;}
       }), C);
       assert.strictEqual(C.prototype, Cfirstproto);
       var c3 = new C();
@@ -270,15 +270,23 @@ describe("ud", function() {
       assert.strictEqual(Object.getPrototypeOf(c3), Cfirstproto);
       assert.strictEqual(c3.x, 3);
       assert.strictEqual(c3.foo(), 'baz');
-      assert.strictEqual((c3:any).bar(), 'bar');
+      assert(!has(c3, 'one'));
+      assert(!has(c3, 'two'));
+      assert.strictEqual((c3:any).three(), 3);
       assert.strictEqual(c2.x, 2);
       assert.strictEqual(c2.foo(), 'baz');
-      assert.strictEqual((c2:any).bar(), 'bar');
+      assert(!has(c2, 'one'));
+      assert(!has(c2, 'two'));
+      assert.strictEqual((c2:any).three(), 3);
       assert.strictEqual(c1.x, 1);
       assert.strictEqual(c1.foo(), 'baz');
-      assert.strictEqual((c1:any).bar(), 'bar');
+      assert(!has(c1, 'one'));
+      assert(!has(c1, 'two'));
+      assert.strictEqual((c1:any).three(), 3);
       assert.strictEqual(C.sfoo(), 'baz');
-      assert.strictEqual((C:any).sbar(), 'baz');
+      assert(!has(C, 'one'));
+      assert(!has(C, 'two'));
+      assert.strictEqual((C:any).three(), 3.1);
     });
 
     it("can change a class's superclass", function() {

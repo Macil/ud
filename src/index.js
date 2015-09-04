@@ -45,18 +45,36 @@ export function defonce<T>(module: typeof module, fn: ()=>T, key?:string=''): T 
 export function defobj<T: Object>(module: typeof module, object: T, key?:string=''): T {
   var sharedObject = defonce(module, ()=>object, '--defobj-'+key);
   if (sharedObject !== object) {
-    Object.defineProperties(
-      sharedObject,
-      _.chain(Object.getOwnPropertyNames(object))
-        .map(name => [name, Object.getOwnPropertyDescriptor(object, name)])
-        .map(([name, {value,enumerable}]) =>
-          [name, {value,enumerable,writable:true,configurable:true}]
-        )
-        .zipObject()
-        .value()
-    );
+    cloneOntoTarget(sharedObject, object);
   }
   return sharedObject;
+}
+
+// Assigns all properties of object onto target, and deletes any properties
+// from target that don't exist on object. The optional blacklist argument
+// specifies properties to not assign on target.
+function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?string[]): T {
+  _.chain(Object.getOwnPropertyNames(target))
+    .filter(name => !Object.prototype.hasOwnProperty.call(object, name))
+    .forEach(name => {
+      delete target[name];
+    })
+    .value();
+  var newPropsChain = _.chain(Object.getOwnPropertyNames(object));
+  if (blacklist) {
+    newPropsChain = newPropsChain.filter(name => !_.includes(blacklist, name));
+  }
+  Object.defineProperties(
+    target,
+    newPropsChain
+      .map(name => [name, Object.getOwnPropertyDescriptor(object, name)])
+      .map(([name, {value,enumerable}]) =>
+        [name, {value,enumerable,writable:true,configurable:true}]
+      )
+      .zipObject()
+      .value()
+  );
+  return target;
 }
 
 export function defn<T: Function>(module: typeof module, fn: T, key?:string=''): T {
@@ -92,17 +110,7 @@ export function defn<T: Function>(module: typeof module, fn: T, key?:string=''):
     if (Object.getPrototypeOf(shared.wrapper) !== newSuperFnProto) {
       /*::`*/ Object.setPrototypeOf(shared.wrapper, newSuperFnProto); /*::`;*/
     }
-    Object.defineProperties(
-      shared.wrapper,
-      _.chain(Object.getOwnPropertyNames(fn))
-        .filter(name => !_.includes(funcPropBlacklist, name))
-        .map(name => [name, Object.getOwnPropertyDescriptor(fn, name)])
-        .map(([name, {value,enumerable}]) =>
-          [name, {value,enumerable,writable:true,configurable:true}]
-        )
-        .zipObject()
-        .value()
-    );
+    cloneOntoTarget(shared.wrapper, fn, funcPropBlacklist);
   }
   return shared.wrapper;
 }
