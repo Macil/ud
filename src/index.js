@@ -54,7 +54,11 @@ export function defobj<T: Object>(module: typeof module, object: T, key?:string=
 // from target that don't exist on object. The optional blacklist argument
 // specifies properties to not assign on target.
 function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?string[]): T {
-  _.chain(Object.getOwnPropertyNames(target))
+  var targetPropsChain = _.chain(Object.getOwnPropertyNames(target));
+  if (blacklist) {
+    targetPropsChain = targetPropsChain.filter(name => !_.includes(blacklist, name));
+  }
+  targetPropsChain
     .filter(name => !Object.prototype.hasOwnProperty.call(object, name))
     .forEach(name => {
       delete target[name];
@@ -87,6 +91,7 @@ export function defn<T: Function>(module: typeof module, fn: T, key?:string=''):
       shared.wrapper = new Function(
         'shared',
         `
+        'use strict';
         return function ${fn.name}__ud_wrapper(${paramsList}){
           return shared.fn.apply(this, arguments);
         };
