@@ -22,7 +22,8 @@ export function defonce<T>(module: typeof module, fn: ()=>T, key?:string=''): T 
     throw new Error("ud functions can only be used once per module with a given key");
   }
   usedKeys.add(key);
-  let value;
+  let valueWasSet = false;
+  let value: any;
   if ((module:any).hot) {
     if (
       (module:any).hot.data &&
@@ -30,6 +31,7 @@ export function defonce<T>(module: typeof module, fn: ()=>T, key?:string=''): T 
       Object.prototype.hasOwnProperty.call((module:any).hot.data.__ud__, key)
     ) {
       value = (module:any).hot.data.__ud__[key];
+      valueWasSet = true;
     }
     (module:any).hot.dispose(data => {
       if (!data.__ud__)
@@ -37,7 +39,7 @@ export function defonce<T>(module: typeof module, fn: ()=>T, key?:string=''): T 
       data.__ud__[key] = value;
     });
   }
-  if (value === undefined)
+  if (!valueWasSet)
     value = fn();
   return value;
 }

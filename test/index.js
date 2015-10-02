@@ -93,6 +93,50 @@ describe("ud", function() {
       assert.strictEqual(ud.defonce(_module3, bomb), obj);
       assert(_module3.hot.accept.called);
     });
+
+    it("works with undefined return value", function() {
+      let _module1: any = {
+        hot: {
+          data: null,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      assert.strictEqual(ud.defonce(_module1, ()=>undefined), undefined);
+      assert(_module1.hot.accept.called);
+
+      const hotData1 = {};
+      _module1.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData1);
+      });
+      _module1 = null; // make sure we don't accidentally re-use this
+
+      let _module2: any = {
+        hot: {
+          data: hotData1,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      assert.strictEqual(ud.defonce(_module2, bomb), undefined);
+      assert(_module2.hot.accept.called);
+
+      const hotData2 = {};
+      _module2.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData2);
+      });
+      _module2 = null;
+
+      let _module3: any = {
+        hot: {
+          data: hotData2,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      assert.strictEqual(ud.defonce(_module3, bomb), undefined);
+      assert(_module3.hot.accept.called);
+    });
   });
 
   describe("defobj", function() {
