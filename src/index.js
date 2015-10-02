@@ -83,23 +83,22 @@ function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?stri
 
 export function defn<T: Function>(module: typeof module, fn: T, key?:string=''): T {
   const shared = defonce(module, ()=>{
-    const shared: Object = {fn: null, wrapper: null};
     if (!(module:any).hot) {
       return {fn: null, wrapper: fn};
-    } else {
-      const paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
-      shared.wrapper = new Function(
-        'shared',
-        `
-        'use strict';
-        return function ${fn.name}__ud_wrapper(${paramsList}){
-          return shared.fn.apply(this, arguments);
-        };
-        `
-      )(shared);
-      (shared.wrapper:any).prototype = fn.prototype;
-      (shared.wrapper:any).prototype.constructor = shared.wrapper;
     }
+    const shared: Object = {fn: null, wrapper: null};
+    const paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
+    shared.wrapper = new Function(
+      'shared',
+      `
+      'use strict';
+      return function ${fn.name}__ud_wrapper(${paramsList}){
+        return shared.fn.apply(this, arguments);
+      };
+      `
+    )(shared);
+    (shared.wrapper:any).prototype = fn.prototype;
+    (shared.wrapper:any).prototype.constructor = shared.wrapper;
     return shared;
   }, '--defn-shared-'+key);
   shared.fn = fn;
