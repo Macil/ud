@@ -26,8 +26,10 @@
   },
   "homepage": "https://github.com/AgentME/ud#readme",
   "dependencies": {
+    "array-range": "^1.0.1",
     "babel-runtime": "^5.8.20",
-    "lodash": "^3.10.1"
+    "indexof": "0.0.1",
+    "zip-object": "^0.1.0"
   },
   "devDependencies": {
     "babel": "^5.8.21",

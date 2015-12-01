@@ -1,7 +1,9 @@
 /* @flow */
 //jshint ignore:start
 
-const _ = require('lodash');
+const indexof = require('indexof');
+const range = require('array-range');
+const zipObject = require('zip-object');
 const moduleUsedUdKeys: WeakMap<typeof module, Set<string>> = new WeakMap();
 const funcPropBlacklist = ['length', 'name', 'arguments', 'caller', 'prototype'];
 
@@ -56,29 +58,27 @@ export function defobj<T: Object>(module: typeof module, object: T, key?:string=
 // from target that don't exist on object. The optional blacklist argument
 // specifies properties to not assign on target.
 function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?string[]): T {
-  let targetPropsChain = _.chain(Object.getOwnPropertyNames(target));
+  let targetPropsChain = Object.getOwnPropertyNames(target);
   if (blacklist) {
-    targetPropsChain = targetPropsChain.filter(name => !_.includes(blacklist, name));
+    targetPropsChain = targetPropsChain.filter(name => indexof(blacklist, name) < 0);
   }
   targetPropsChain
     .filter(name => !Object.prototype.hasOwnProperty.call(object, name))
     .forEach(name => {
       delete target[name];
-    })
-    .value();
-  let newPropsChain = _.chain(Object.getOwnPropertyNames(object));
+    });
+  let newPropsChain = Object.getOwnPropertyNames(object);
   if (blacklist) {
-    newPropsChain = newPropsChain.filter(name => !_.includes(blacklist, name));
+    newPropsChain = newPropsChain.filter(name => indexof(blacklist, name) < 0);
   }
   Object.defineProperties(
     target,
-    newPropsChain
+    zipObject(newPropsChain, newPropsChain
       .map(name => [name, Object.getOwnPropertyDescriptor(object, name)])
       .map(([name, {value,enumerable}]) =>
-        [name, {value,enumerable,writable:true,configurable:true}]
+        ({value,enumerable,writable:true,configurable:true})
       )
-      .zipObject()
-      .value()
+    )
   );
   return target;
 }
@@ -89,7 +89,7 @@ export function defn<T: Function>(module: typeof module, fn: T, key?:string=''):
       return {fn: null, wrapper: fn};
     }
     const shared: Object = {fn: null, wrapper: null};
-    const paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
+    const paramsList = range(fn.length).map(x => 'a'+x).join(',');
     shared.wrapper = new Function(
       'shared',
       `
