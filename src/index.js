@@ -1,7 +1,8 @@
 /* @flow */
 //jshint ignore:start
 
-const _ = require('lodash');
+const range = require('array-range');
+const zipObject = require('zip-object');
 const moduleUsedUdKeys: WeakMap<typeof module, Set<string>> = new WeakMap();
 const funcPropBlacklist = ['length', 'name', 'arguments', 'caller', 'prototype'];
 
@@ -23,7 +24,7 @@ export function defonce<T>(module: typeof module, fn: ()=>T, key?:string=''): T 
   }
   usedKeys.add(key);
   let valueWasSet = false;
-  let value: any;
+  let value: any = undefined;
   if ((module:any).hot) {
     if (
       (module:any).hot.data &&
@@ -56,29 +57,29 @@ export function defobj<T: Object>(module: typeof module, object: T, key?:string=
 // from target that don't exist on object. The optional blacklist argument
 // specifies properties to not assign on target.
 function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?string[]): T {
-  let targetPropsChain = _.chain(Object.getOwnPropertyNames(target));
-  if (blacklist) {
-    targetPropsChain = targetPropsChain.filter(name => !_.includes(blacklist, name));
+  const cBlacklist = blacklist; // assert to Flow that type refinements stay valid
+
+  let targetPropsChain = Object.getOwnPropertyNames(target);
+  if (cBlacklist) {
+    targetPropsChain = targetPropsChain.filter(name => cBlacklist.indexOf(name) < 0);
   }
   targetPropsChain
     .filter(name => !Object.prototype.hasOwnProperty.call(object, name))
     .forEach(name => {
       delete target[name];
-    })
-    .value();
-  let newPropsChain = _.chain(Object.getOwnPropertyNames(object));
-  if (blacklist) {
-    newPropsChain = newPropsChain.filter(name => !_.includes(blacklist, name));
+    });
+  let newPropsChain = Object.getOwnPropertyNames(object);
+  if (cBlacklist) {
+    newPropsChain = newPropsChain.filter(name => cBlacklist.indexOf(name) < 0);
   }
   Object.defineProperties(
     target,
-    newPropsChain
+    zipObject(newPropsChain, newPropsChain
       .map(name => [name, Object.getOwnPropertyDescriptor(object, name)])
       .map(([name, {value,enumerable}]) =>
-        [name, {value,enumerable,writable:true,configurable:true}]
+        ({value,enumerable,writable:true,configurable:true})
       )
-      .zipObject()
-      .value()
+    )
   );
   return target;
 }
@@ -86,10 +87,10 @@ function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?stri
 export function defn<T: Function>(module: typeof module, fn: T, key?:string=''): T {
   const shared = defonce(module, ()=>{
     if (!(module:any).hot) {
-      return {fn: null, wrapper: fn};
+      return {fn: (null: ?T), wrapper: fn};
     }
     const shared: Object = {fn: null, wrapper: null};
-    const paramsList = _.range(fn.length).map(x => 'a'+x).join(',');
+    const paramsList = range(fn.length).map(x => 'a'+x).join(',');
     shared.wrapper = new Function(
       'shared',
       `

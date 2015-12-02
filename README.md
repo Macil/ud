@@ -65,20 +65,7 @@ would not be updated.
 ## Types
 
 Full [Flow Type](http://flowtype.org/) declarations for this module are
-included. These must be manually enabled to use because Flow [doesn't allow
-modules to automatically include their own
-declarations](https://github.com/facebook/flow/issues/593) yet. The module must
-also be added to the [ignore] section because of [this
-bug](https://github.com/facebook/flow/issues/676).
-Add these lines to your `.flowconfig` to enable them:
-
-```
-[ignore]
-.*/node_modules/ud/.*
-
-[libs]
-node_modules/ud/flow-lib.js
-```
+included!
 
 ## See Also
 
