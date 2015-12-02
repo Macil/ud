@@ -24,7 +24,7 @@ export function defonce<T>(module: typeof module, fn: ()=>T, key?:string=''): T 
   }
   usedKeys.add(key);
   let valueWasSet = false;
-  let value: any;
+  let value: any = undefined;
   if ((module:any).hot) {
     if (
       (module:any).hot.data &&
@@ -87,7 +87,7 @@ function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?stri
 export function defn<T: Function>(module: typeof module, fn: T, key?:string=''): T {
   const shared = defonce(module, ()=>{
     if (!(module:any).hot) {
-      return {fn: null, wrapper: fn};
+      return {fn: (null: ?T), wrapper: fn};
     }
     const shared: Object = {fn: null, wrapper: null};
     const paramsList = range(fn.length).map(x => 'a'+x).join(',');
