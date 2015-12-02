@@ -28,7 +28,6 @@
   "dependencies": {
     "array-range": "^1.0.1",
     "babel-runtime": "^5.8.20",
-    "indexof": "0.0.1",
     "zip-object": "^0.1.0"
   },
   "devDependencies": {

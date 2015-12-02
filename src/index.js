@@ -1,7 +1,6 @@
 /* @flow */
 //jshint ignore:start
 
-const indexof = require('indexof');
 const range = require('array-range');
 const zipObject = require('zip-object');
 const moduleUsedUdKeys: WeakMap<typeof module, Set<string>> = new WeakMap();
@@ -58,9 +57,11 @@ export function defobj<T: Object>(module: typeof module, object: T, key?:string=
 // from target that don't exist on object. The optional blacklist argument
 // specifies properties to not assign on target.
 function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?string[]): T {
+  const cBlacklist = blacklist; // assert to Flow that type refinements stay valid
+
   let targetPropsChain = Object.getOwnPropertyNames(target);
-  if (blacklist) {
-    targetPropsChain = targetPropsChain.filter(name => indexof(blacklist, name) < 0);
+  if (cBlacklist) {
+    targetPropsChain = targetPropsChain.filter(name => cBlacklist.indexOf(name) < 0);
   }
   targetPropsChain
     .filter(name => !Object.prototype.hasOwnProperty.call(object, name))
@@ -68,8 +69,8 @@ function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?stri
       delete target[name];
     });
   let newPropsChain = Object.getOwnPropertyNames(object);
-  if (blacklist) {
-    newPropsChain = newPropsChain.filter(name => indexof(blacklist, name) < 0);
+  if (cBlacklist) {
+    newPropsChain = newPropsChain.filter(name => cBlacklist.indexOf(name) < 0);
   }
   Object.defineProperties(
     target,
