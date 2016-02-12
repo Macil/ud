@@ -1,6 +1,0 @@
-/* @flow */
-
-declare export function markReloadable(module: typeof module): void;
-declare export function defonce<T>(module: typeof module, fn: ()=>T, key?: string): T;
-declare export function defobj<T: Object>(module: typeof module, object: T, key?: string): T;
-declare export function defn<T: Function>(module: typeof module, fn: T, key?: string): T;
