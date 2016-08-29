@@ -1,5 +1,4 @@
 /* @flow */
-//jshint ignore:start
 
 const range = require('array-range');
 const zipObject = require('zip-object');
@@ -20,7 +19,7 @@ export function defonce<T>(module: typeof module, fn: ()=>T, key?:string=''): T 
     moduleUsedUdKeys.set(module, usedKeys);
   }
   if (usedKeys.has(key)) {
-    throw new Error("ud functions can only be used once per module with a given key");
+    throw new Error('ud functions can only be used once per module with a given key');
   }
   usedKeys.add(key);
   let valueWasSet = false;
@@ -75,8 +74,8 @@ function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?stri
   Object.defineProperties(
     target,
     zipObject(newPropsChain, newPropsChain
-      .map(name => [name, Object.getOwnPropertyDescriptor(object, name)])
-      .map(([name, {value,enumerable}]) =>
+      .map(name => Object.getOwnPropertyDescriptor(object, name))
+      .map(({value,enumerable}) =>
         ({value,enumerable,writable:true,configurable:true})
       )
     )

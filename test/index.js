@@ -1,21 +1,21 @@
 /* @flow */
-//jshint ignore:start
+/* eslint-disable block-spacing,brace-style */
 
 const sinon = require('sinon');
 const assert = require('assert');
-import * as ud from "../src";
+import * as ud from '../src';
 
 function bomb() {
-  throw new Error("Should not be called");
+  throw new Error('Should not be called');
 }
 
 function has(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-describe("ud", function() {
-  describe("markReloadable", function() {
-    it("calls module.hot.accept when available", function() {
+describe('ud', function() {
+  describe('markReloadable', function() {
+    it('calls module.hot.accept when available', function() {
       const _module: any = {
         hot: {
           accept: sinon.spy()
@@ -30,13 +30,13 @@ describe("ud", function() {
     });
   });
 
-  describe("defonce", function() {
-    it("works if no module.hot", function() {
+  describe('defonce', function() {
+    it('works if no module.hot', function() {
       const obj = {};
       assert.strictEqual(ud.defonce(({}:any), ()=>obj), obj);
     });
 
-    it("throws if same module and key used multiple times", function() {
+    it('throws if same module and key used multiple times', function() {
       const _module: any = {};
       ud.defonce(_module, ()=>1);
       (assert:any).throws(()=>{
@@ -49,7 +49,7 @@ describe("ud", function() {
       }, 'ud functions can only be used once per module with a given key');
     });
 
-    it("works over two reloads", function() {
+    it('works over two reloads', function() {
       let _module1: any = {
         hot: {
           data: null,
@@ -94,7 +94,7 @@ describe("ud", function() {
       assert(_module3.hot.accept.called);
     });
 
-    it("works with undefined return value", function() {
+    it('works with undefined return value', function() {
       let _module1: any = {
         hot: {
           data: null,
@@ -139,13 +139,13 @@ describe("ud", function() {
     });
   });
 
-  describe("defobj", function() {
-    it("works if no module.hot", function() {
+  describe('defobj', function() {
+    it('works if no module.hot', function() {
       const obj = {};
       assert.strictEqual(ud.defobj(({}:any), obj), obj);
     });
 
-    it("works", function() {
+    it('works', function() {
       let _module1: any = {
         hot: {
           data: null,
@@ -176,8 +176,8 @@ describe("ud", function() {
     });
   });
 
-  describe("defn", function() {
-    it("works if no module.hot", function() {
+  describe('defn', function() {
+    it('works if no module.hot', function() {
       const fn = ()=>5;
       assert.strictEqual(ud.defn(({}:any), fn), fn);
 
@@ -188,7 +188,7 @@ describe("ud", function() {
       assert.strictEqual(C.prototype.constructor, C);
     });
 
-    it("works on basic functions", function() {
+    it('works on basic functions', function() {
       let _module1: any = {
         hot: {
           data: null,
@@ -217,7 +217,7 @@ describe("ud", function() {
       assert.strictEqual(fn(), 6);
     });
 
-    it("works on classes", function() {
+    it('works on classes', function() {
       let _module1: any = {
         hot: {
           data: null,
