@@ -65,6 +65,25 @@ brand new counter. If `ud.defn` were not used to define the inc function, then
 the previously exported function that other modules may have local copies of
 would not be updated.
 
+### Building for Production
+
+If you want to avoid the extra bytes that make `ud` work in your production
+build which does not need hot module replacement, you can swap `require('ud')`
+for `require('ud/production')`.
+
+In browserify, you can do this with:
+
+```
+browserify -r ud/production:ud main.js > bundle.js
+```
+
+or from the API:
+
+``` js
+var b = browserify('main.js')
+  .require('ud/production', { target: 'ud' })
+```
+
 ## Types
 
 [Flow](https://flowtype.org/) type declarations for this module are included!
