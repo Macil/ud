@@ -65,6 +65,21 @@ brand new counter. If `ud.defn` were not used to define the inc function, then
 the previously exported function that other modules may have local copies of
 would not be updated.
 
+## No-op / Production Builds
+
+For non-HMR builds such as typical production builds, all of ud's functions
+will work correctly as they normally do on the first run. However, ud's code
+and its dependencies (mostly babel-included polyfills; it adds up to ~50kb,
+though if your bundle is already using these same dependencies, such as if you
+or your other dependencies are already also using babel-runtime or
+babel-polyfill in the bundle, then ud isn't necessarily bringing as much into
+the bundle!) may be dead weight that can be safely removed. You can swap out ud
+for a simpler no-op implementation by configuring your build process to use the
+"ud/noop" module in place of "ud". Here's an example of doing this with
+Browserify via the CLI:
+
+    browserify -r ud/noop:ud main.js > bundle.js
+
 ## Types
 
 [Flow](https://flowtype.org/) type declarations for this module are included!
