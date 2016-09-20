@@ -4,6 +4,7 @@
 const sinon = require('sinon');
 const assert = require('assert');
 import * as ud from '../src';
+import * as udNoop from '../src/noop';
 
 function bomb() {
   throw new Error('Should not be called');
@@ -28,9 +29,18 @@ describe('ud', function() {
     it("does nothing if module.hot isn't available", function() {
       ud.markReloadable(({}:any));
     });
+
+    it('noop', function() {
+      udNoop.markReloadable(({}:any));
+    });
   });
 
   describe('defonce', function() {
+    it('noop', function() {
+      const obj = {};
+      assert.strictEqual(udNoop.defonce(({}:any), ()=>obj), obj);
+    });
+
     it('works if no module.hot', function() {
       const obj = {};
       assert.strictEqual(ud.defonce(({}:any), ()=>obj), obj);
@@ -140,6 +150,11 @@ describe('ud', function() {
   });
 
   describe('defobj', function() {
+    it('noop', function() {
+      const obj = {};
+      assert.strictEqual(udNoop.defobj(({}:any), obj), obj);
+    });
+
     it('works if no module.hot', function() {
       const obj = {};
       assert.strictEqual(ud.defobj(({}:any), obj), obj);
@@ -177,6 +192,17 @@ describe('ud', function() {
   });
 
   describe('defn', function() {
+    it('noop', function() {
+      const fn = ()=>5;
+      assert.strictEqual(udNoop.defn(({}:any), fn), fn);
+
+      class C {}
+      const Cproto = C.prototype;
+      assert.strictEqual(udNoop.defn(({}:any), C), C);
+      assert.strictEqual(C.prototype, Cproto);
+      assert.strictEqual(C.prototype.constructor, C);
+    });
+
     it('works if no module.hot', function() {
       const fn = ()=>5;
       assert.strictEqual(ud.defn(({}:any), fn), fn);
