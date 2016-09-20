@@ -4,7 +4,7 @@
   "description": "Utilities for updating code live with hot module replacement",
   "main": "js/index.js",
   "scripts": {
-    "prepublish": "babel -s inline -d js/ src/ && flow-copy-source -v src js",
+    "prepublish": "babel -s inline -d js/ src/ && flow-copy-source -v src js && mv -v js/noop.js* ./",
     "test": "npm run lint && npm run flow_check && mocha",
     "flow_check": "flow check",
     "lint": "eslint .",
