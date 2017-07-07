@@ -42,6 +42,7 @@
     "babel-preset-es2015": "^6.5.0",
     "babel-register": "^6.5.1",
     "eslint": "^4.1.1",
+    "eslint-plugin-flowtype": "^2.34.1",
     "flow-bin": "^0.49.1",
     "flow-copy-source": "^1.0.0",
     "mocha": "^3.0.2",
