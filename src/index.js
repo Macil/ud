@@ -90,7 +90,7 @@ export function defn<T: Function>(module: typeof module, fn: T, key?:string=''):
     }
     const shared: Object = {fn: null, wrapper: null};
     const paramsList = range(fn.length).map(x => 'a'+x).join(',');
-    shared.wrapper = new Function(
+    shared.wrapper = (new Function(
       'shared',
       `
       'use strict';
@@ -98,7 +98,7 @@ export function defn<T: Function>(module: typeof module, fn: T, key?:string=''):
         return shared.fn.apply(this, arguments);
       };
       `
-    )(shared);
+    ): any)(shared);
     (shared.wrapper:any).prototype = fn.prototype;
     (shared.wrapper:any).prototype.constructor = shared.wrapper;
     return shared;

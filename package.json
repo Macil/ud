@@ -4,7 +4,7 @@
   "description": "Utilities for updating code live with hot module replacement",
   "main": "js/index.js",
   "scripts": {
-    "prepublish": "babel -s inline -d js/ src/ && flow-copy-source -v src js && mv -v js/noop.js* ./",
+    "prepare": "rimraf js/ && babel -s inline -d js/ src/ && flow-copy-source -v src js && mv -v js/noop.js* ./",
     "test": "npm run lint && npm run flow_check && mocha",
     "flow_check": "flow check",
     "lint": "eslint .",
@@ -42,9 +42,10 @@
     "babel-preset-es2015": "^6.5.0",
     "babel-register": "^6.5.1",
     "eslint": "^3.4.0",
-    "flow-bin": "^0.36.0",
+    "flow-bin": "^0.49.1",
     "flow-copy-source": "^1.0.0",
     "mocha": "^3.0.2",
+    "rimraf": "^2.6.1",
     "sinon": "^1.16.1"
   }
 }
