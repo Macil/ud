@@ -14,6 +14,13 @@ function has(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
+function feval(code: String, parameters: {[name:string]:any} = {}): any {
+  const entries = Object.entries(parameters);
+  const names = entries.map(e => e[0]);
+  const values = entries.map(e => e[1]);
+  return Function(...names, `"use strict"; return (${code});`)(...values);
+}
+
 describe('ud', function() {
   describe('markReloadable', function() {
     it('calls module.hot.accept when available', function() {
@@ -222,7 +229,7 @@ describe('ud', function() {
           dispose: sinon.spy()
         }
       };
-      const fn = ud.defn(_module1, ()=>5);
+      const fn = ud.defn(_module1, function() {return 5;});
       assert.strictEqual(fn(), 5);
       assert(_module1.hot.accept.called);
 
@@ -239,7 +246,38 @@ describe('ud', function() {
           dispose: sinon.spy()
         }
       };
-      assert.strictEqual(ud.defn(_module2, ()=>6), fn);
+      assert.strictEqual(ud.defn(_module2, function() {return 6;}), fn);
+      assert.strictEqual(fn(), 6);
+    });
+
+    it('works on native arrow functions', function() {
+      let _module1: any = {
+        hot: {
+          data: null,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+
+      // create the arrow function in eval where babel won't transpile it
+      const fn = ud.defn(_module1, feval('() => 5'));
+      assert.strictEqual(fn(), 5);
+      assert(_module1.hot.accept.called);
+
+      const hotData1 = {};
+      _module1.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData1);
+      });
+      _module1 = null;
+
+      let _module2: any = {
+        hot: {
+          data: hotData1,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      assert.strictEqual(ud.defn(_module2, feval('() => 6')), fn);
       assert.strictEqual(fn(), 6);
     });
 
@@ -334,6 +372,122 @@ describe('ud', function() {
         three() {return 3;}
         static three() {return 3.1;}
       }), C);
+      assert.strictEqual(C.prototype, Cfirstproto);
+      const c3 = new C();
+      assert.strictEqual(c3.constructor, C);
+      assert.strictEqual(Object.getPrototypeOf(c3), Cfirstproto);
+      assert.strictEqual(c3.x, 3);
+      assert.strictEqual(c3.foo(), 'baz');
+      assert(!has(c3, 'one'));
+      assert(!has(c3, 'two'));
+      assert.strictEqual((c3:any).three(), 3);
+      assert.strictEqual(c2.x, 2);
+      assert.strictEqual(c2.foo(), 'baz');
+      assert(!has(c2, 'one'));
+      assert(!has(c2, 'two'));
+      assert.strictEqual((c2:any).three(), 3);
+      assert.strictEqual(c1.x, 1);
+      assert.strictEqual(c1.foo(), 'baz');
+      assert(!has(c1, 'one'));
+      assert(!has(c1, 'two'));
+      assert.strictEqual((c1:any).three(), 3);
+      assert.strictEqual(C.sfoo(), 'baz');
+      assert(!has(C, 'one'));
+      assert(!has(C, 'two'));
+      assert.strictEqual((C:any).three(), 3.1);
+    });
+
+    xit('works on native classes', function() {
+      let _module1: any = {
+        hot: {
+          data: null,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      const C = ud.defn(_module1, feval(`class C {
+        // x: number;
+        constructor() {
+          this.x = 1;
+        }
+        foo() {return 'foo';}
+        static sfoo() {return 'foo';}
+        one() {return 1;}
+        static one() {return 1.1;}
+      }`));
+      const Cfirstproto = C.prototype;
+      const c1 = new C();
+      assert.strictEqual(c1.constructor, C);
+      assert.strictEqual(Object.getPrototypeOf(c1), Cfirstproto);
+      assert.strictEqual(c1.x, 1);
+      assert.strictEqual(c1.foo(), 'foo');
+      assert.strictEqual(c1.one(), 1);
+      assert.strictEqual(C.sfoo(), 'foo');
+      assert.strictEqual(C.one(), 1.1);
+      assert(_module1.hot.accept.called);
+
+      const hotData1 = {};
+      _module1.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData1);
+      });
+      _module1 = null;
+
+      let _module2: any = {
+        hot: {
+          data: hotData1,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      assert.strictEqual(ud.defn(_module2, feval(`class C {
+        // x: number;
+        constructor() {
+          this.x = 2;
+        }
+        foo() {return 'bar';}
+        static sfoo() {return 'bar';}
+        two() {return 2;}
+        static two() {return 2.1;}
+      }`)), C);
+      assert.strictEqual(C.prototype, Cfirstproto);
+      const c2 = new C();
+      assert.strictEqual(c2.constructor, C);
+      assert.strictEqual(Object.getPrototypeOf(c2), Cfirstproto);
+      assert.strictEqual(c2.x, 2);
+      assert.strictEqual(c2.foo(), 'bar');
+      assert(!has(c2, 'one'));
+      assert.strictEqual((c2:any).two(), 2);
+      assert.strictEqual(c1.x, 1);
+      assert.strictEqual(c1.foo(), 'bar');
+      assert(!has(c1, 'one'));
+      assert.strictEqual((c1:any).two(), 2);
+      assert.strictEqual(C.sfoo(), 'bar');
+      assert(!has(C, 'one'));
+      assert.strictEqual((C:any).two(), 2.1);
+
+      const hotData2 = {};
+      _module2.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData2);
+      });
+      _module2 = null;
+
+      let _module3: any = {
+        hot: {
+          data: hotData2,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      assert.strictEqual(ud.defn(_module3, feval(`class C {
+        // x: number;
+        constructor() {
+          this.x = 3;
+        }
+        foo() {return 'baz';}
+        static sfoo() {return 'baz';}
+        three() {return 3;}
+        static three() {return 3.1;}
+      }`)), C);
       assert.strictEqual(C.prototype, Cfirstproto);
       const c3 = new C();
       assert.strictEqual(c3.constructor, C);
@@ -496,6 +650,172 @@ describe('ud', function() {
           return 3;
         }
       }), C);
+      const c3 = new C();
+      assert(c3 instanceof C);
+      assert(c3 instanceof S3);
+      assert(!(c3 instanceof S2));
+      assert(!(c3 instanceof S1));
+      assert.strictEqual(c3.s, 3);
+      assert.strictEqual(c3.calls(), 3);
+      assert.strictEqual(c3.c, 3);
+      assert.strictEqual(c3.callc(), 3);
+      assert(c2 instanceof C);
+      assert(c2 instanceof S3);
+      assert(!(c2 instanceof S2));
+      assert(!(c2 instanceof S1));
+      assert.strictEqual(c2.s, 2);
+      assert.strictEqual(c2.calls(), 3);
+      assert.strictEqual(c2.c, 2);
+      assert.strictEqual(c2.callc(), 3);
+      assert(c1 instanceof C);
+      assert(c1 instanceof S3);
+      assert(!(c1 instanceof S2));
+      assert(!(c1 instanceof S1));
+      assert.strictEqual(c1.s, 1);
+      assert.strictEqual(c1.calls(), 3);
+      assert.strictEqual(c1.c, 1);
+      assert.strictEqual(c1.callc(), 3);
+      assert.strictEqual(C.scalls(), 3);
+      assert.strictEqual(C.scallc(), 3);
+    });
+
+    xit("can change a native class's superclass", function() {
+      let _module1: any = {
+        hot: {
+          data: null,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      const S1 = feval(`class S1 {
+        // s: number;
+        constructor() {
+          this.s = 1;
+        }
+        calls() {
+          return 1;
+        }
+        static scalls() {
+          return 1;
+        }
+      }`);
+      const C = ud.defn(_module1, feval(`class C extends S1 {
+        // c: number;
+        constructor() {
+          super();
+          this.c = 1;
+        }
+        callc() {
+          return 1;
+        }
+        static scallc() {
+          return 1;
+        }
+      }`, {S1}));
+      const c1 = new C();
+      assert(c1 instanceof C);
+      assert(c1 instanceof S1);
+      assert.strictEqual(c1.s, 1);
+      assert.strictEqual(c1.calls(), 1);
+      assert.strictEqual(c1.c, 1);
+      assert.strictEqual(c1.callc(), 1);
+      assert.strictEqual(C.scalls(), 1);
+      assert.strictEqual(C.scallc(), 1);
+
+      const hotData1 = {};
+      _module1.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData1);
+      });
+      _module1 = null;
+
+      let _module2: any = {
+        hot: {
+          data: hotData1,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      const S2 = feval(`class S2 {
+        // s: number;
+        constructor() {
+          this.s = 2;
+        }
+        calls() {
+          return 2;
+        }
+        static scalls() {
+          return 2;
+        }
+      }`);
+      assert.strictEqual(ud.defn(_module2, feval(`class C extends S2 {
+        // c: number;
+        constructor() {
+          super();
+          this.c = 2;
+        }
+        callc() {
+          return 2;
+        }
+        static scallc() {
+          return 2;
+        }
+      }`, {S2})), C);
+      const c2 = new C();
+      assert(c2 instanceof C);
+      assert(c2 instanceof S2);
+      assert(!(c2 instanceof S1));
+      assert.strictEqual(c2.s, 2);
+      assert.strictEqual(c2.calls(), 2);
+      assert.strictEqual(c2.c, 2);
+      assert.strictEqual(c2.callc(), 2);
+      assert(c1 instanceof C);
+      assert(c1 instanceof S2);
+      assert(!(c1 instanceof S1));
+      assert.strictEqual(c1.s, 1);
+      assert.strictEqual(c1.calls(), 2);
+      assert.strictEqual(c1.c, 1);
+      assert.strictEqual(c1.callc(), 2);
+      assert.strictEqual(C.scalls(), 2);
+      assert.strictEqual(C.scallc(), 2);
+
+      const hotData2 = {};
+      _module2.hot.dispose.getCalls().forEach(call => {
+        call.args[0].call(null, hotData2);
+      });
+      _module2 = null;
+
+      let _module3: any = {
+        hot: {
+          data: hotData2,
+          accept: sinon.spy(),
+          dispose: sinon.spy()
+        }
+      };
+      const S3 = feval(`class S3 {
+        // s: number;
+        constructor() {
+          this.s = 3;
+        }
+        calls() {
+          return 3;
+        }
+        static scalls() {
+          return 3;
+        }
+      }`);
+      assert.strictEqual(ud.defn(_module3, feval(`class C extends S3 {
+        // c: number;
+        constructor() {
+          super();
+          this.c = 3;
+        }
+        callc() {
+          return 3;
+        }
+        static scallc() {
+          return 3;
+        }
+      }`, {S3})), C);
       const c3 = new C();
       assert(c3 instanceof C);
       assert(c3 instanceof S3);
