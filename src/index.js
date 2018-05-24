@@ -75,6 +75,7 @@ function cloneOntoTarget<T: Object>(target: T, object: Object, blacklist?: ?stri
     target,
     zipObject(newPropsChain, newPropsChain
       .map(name => Object.getOwnPropertyDescriptor(object, name))
+      .filter(Boolean)
       .map(({value,enumerable}) =>
         ({value,enumerable,writable:true,configurable:true})
       )
