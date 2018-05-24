@@ -14,11 +14,11 @@ function has(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-function feval(code: String, parameters: {[name:string]:any} = {}): any {
+function feval(code: string, parameters: {[name:string]:any} = {}): any {
   const entries = Object.entries(parameters);
-  const names = entries.map(e => e[0]);
-  const values = entries.map(e => e[1]);
-  return Function(...names, `"use strict"; return (${code});`)(...values);
+  const names: string[] = entries.map(e => e[0]);
+  const values: any[] = entries.map(e => e[1]);
+  return new (Function: any)(...names, `"use strict"; return (${code});`)(...values);
 }
 
 describe('ud', function() {
