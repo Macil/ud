@@ -397,7 +397,7 @@ describe('ud', function() {
       assert.strictEqual((C:any).three(), 3.1);
     });
 
-    xit('works on native classes', function() {
+    it('works on native classes', function() {
       let _module1: any = {
         hot: {
           data: null,
@@ -679,7 +679,7 @@ describe('ud', function() {
       assert.strictEqual(C.scallc(), 3);
     });
 
-    xit("can change a native class's superclass", function() {
+    it("can change a native class's superclass", function() {
       let _module1: any = {
         hot: {
           data: null,
