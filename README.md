@@ -1,7 +1,7 @@
 # ud
 
 [![Circle CI](https://circleci.com/gh/AgentME/ud.svg?style=shield)](https://circleci.com/gh/AgentME/ud)
-[![npm version](https://badge.fury.io/js/ud.svg)](https://badge.fury.io/js/ud)
+[![npm version](https://badge.fury.io/js/ud.svg)](https://badge.fury.io/js/ud) [![Greenkeeper badge](https://badges.greenkeeper.io/AgentME/ud.svg)](https://greenkeeper.io/)
 
 Ud is a small set of utilities for updating code live with hot module
 replacement, as supported by
