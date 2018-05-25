@@ -13,6 +13,12 @@ jobs:
             - yarn-packages-master
             - yarn-packages-
       - run:
+          name: Prepare Greenkeeper
+          command: |
+            echo 'export PATH=$(yarn global bin):$PATH' >> "$BASH_ENV"
+            source "$BASH_ENV"
+            yarn global add greenkeeper-lockfile@1
+      - run:
           name: Install Dependencies
           command: yarn install
       - save_cache:
@@ -20,4 +26,8 @@ jobs:
           key: yarn-packages-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules/
+            - ~/.yarn/bin/
+            - ~/.config/yarn/global/
+      - run: greenkeeper-lockfile-update
       - run: yarn test
+      - run: greenkeeper-lockfile-upload
