@@ -1,7 +1,6 @@
 # ud
 
-[![Circle CI](https://circleci.com/gh/AgentME/ud.svg?style=shield)](https://circleci.com/gh/AgentME/ud)
-[![npm version](https://badge.fury.io/js/ud.svg)](https://badge.fury.io/js/ud) [![Greenkeeper badge](https://badges.greenkeeper.io/AgentME/ud.svg)](https://greenkeeper.io/)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/AgentME/ud/blob/master/LICENSE.txt) [![npm version](https://img.shields.io/npm/v/ud.svg?style=flat)](https://www.npmjs.com/package/ud) [![CircleCI Status](https://circleci.com/gh/AgentME/ud.svg?style=shield)](https://circleci.com/gh/AgentME/ud) [![Greenkeeper badge](https://badges.greenkeeper.io/AgentME/ud.svg)](https://greenkeeper.io/)
 
 Ud is a small set of utilities for updating code live with hot module
 replacement, as supported by
