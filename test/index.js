@@ -58,12 +58,12 @@ describe('ud', function() {
       ud.defonce(_module, ()=>1);
       (assert:any).throws(()=>{
         ud.defonce(_module, ()=>2);
-      }, 'ud functions can only be used once per module with a given key');
+      }, /^Error: ud functions can only be used once per module with a given key$/);
 
       ud.defonce(_module, ()=>3, 'foo');
       (assert:any).throws(()=>{
         ud.defonce(_module, ()=>4, 'foo');
-      }, 'ud functions can only be used once per module with a given key');
+      }, /^Error: ud functions can only be used once per module with a given key$/);
     });
 
     it('works over two reloads', function() {
