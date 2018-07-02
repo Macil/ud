@@ -5,7 +5,7 @@
   "main": "js/index.js",
   "scripts": {
     "prepare": "rimraf js/ && babel -s inline -d js/ src/ && flow-copy-source -v src js && mv -v js/noop.js* ./",
-    "test": "npm run lint && npm run flow_check && mocha",
+    "test": "yarn run lint && yarn run flow_check && mocha",
     "flow_check": "flow check",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
