@@ -43,7 +43,7 @@
     "babel-register": "^6.5.1",
     "eslint": "^5.0.0",
     "eslint-plugin-flowtype": "^2.34.1",
-    "flow-bin": "^0.79.0",
+    "flow-bin": "^0.80.0",
     "flow-copy-source": "^2.0.0",
     "mocha": "^5.2.0",
     "rimraf": "^2.6.1",
