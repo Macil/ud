@@ -1,7 +1,11 @@
 {
-  "presets": ["es2015"],
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-flow"
+  ],
   "plugins": [
-    "transform-runtime", "transform-flow-strip-types",
-    "transform-class-properties"
+    ["@babel/plugin-transform-runtime", {
+      "corejs": 2
+    }]
   ]
 }

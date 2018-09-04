@@ -1,1 +1,1 @@
---check-leaks --require babel-register
+--check-leaks --require @babel/register
