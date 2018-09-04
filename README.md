@@ -1,10 +1,10 @@
 # ud
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/AgentME/ud/blob/master/LICENSE.txt) [![npm version](https://img.shields.io/npm/v/ud.svg?style=flat)](https://www.npmjs.com/package/ud) [![CircleCI Status](https://circleci.com/gh/AgentME/ud.svg?style=shield)](https://circleci.com/gh/AgentME/ud) [![Greenkeeper badge](https://badges.greenkeeper.io/AgentME/ud.svg)](https://greenkeeper.io/)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Macil/ud/blob/master/LICENSE.txt) [![npm version](https://img.shields.io/npm/v/ud.svg?style=flat)](https://www.npmjs.com/package/ud) [![CircleCI Status](https://circleci.com/gh/Macil/ud.svg?style=shield)](https://circleci.com/gh/Macil/ud) [![Greenkeeper badge](https://badges.greenkeeper.io/Macil/ud.svg)](https://greenkeeper.io/)
 
 Ud is a small set of utilities for updating code live with hot module
 replacement, as supported by
-[Browserify-HMR](https://github.com/AgentME/browserify-hmr) and
+[Browserify-HMR](https://github.com/Macil/browserify-hmr) and
 [Webpack](https://webpack.github.io/docs/hot-module-replacement.html).
 
 These functions let you accomplish common tasks easily without needing to use
@@ -86,6 +86,6 @@ If you are using Flow, they won't require any configuration to use.
 
 ## See Also
 
-* [ud-kefir](https://github.com/AgentME/ud-kefir), a companion library which
+* [ud-kefir](https://github.com/Macil/ud-kefir), a companion library which
   integrates with [Kefir](https://rpominov.github.io/kefir/) and emits events
   when reloads happen.
