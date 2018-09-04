@@ -3,10 +3,11 @@
   "version": "3.2.0",
   "description": "Utilities for updating code live with hot module replacement",
   "main": "js/index.js",
+  "types": "index.d.ts",
   "sideEffects": false,
   "scripts": {
     "prepare": "rimraf js/ && babel -s inline -d js/ src/ && flow-copy-source -v src js && mv -v js/noop.js* ./",
-    "test": "yarn run lint && yarn run flow_check && mocha",
+    "test": "yarn run lint && yarn run flow_check && mocha && tsc",
     "flow_check": "flow check",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
@@ -31,6 +32,7 @@
   "homepage": "https://github.com/Macil/ud#readme",
   "dependencies": {
     "@babel/runtime-corejs2": "^7.0.0",
+    "@types/node": "^10.9.4",
     "array-range": "^1.0.1",
     "zip-object": "^0.1.0"
   },
@@ -48,7 +50,8 @@
     "flow-copy-source": "^2.0.0",
     "mocha": "^5.2.0",
     "rimraf": "^2.6.1",
-    "sinon": "^6.0.0"
+    "sinon": "^6.0.0",
+    "typescript": "^3.0.3"
   },
   "greenkeeper": {
     "ignore": [
