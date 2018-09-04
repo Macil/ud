@@ -48,5 +48,10 @@
     "mocha": "^5.2.0",
     "rimraf": "^2.6.1",
     "sinon": "^6.0.0"
+  },
+  "greenkeeper": {
+    "ignore": [
+      "flow-bin"
+    ]
   }
 }
