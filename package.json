@@ -48,7 +48,7 @@
     "eslint-plugin-flowtype": "^4.0.0",
     "flow-bin": "^0.100.0",
     "flow-copy-source": "^2.0.0",
-    "mocha": "^6.0.0",
+    "mocha": "^7.0.1",
     "rimraf": "^3.0.0",
     "sinon": "^7.2.6",
     "typescript": "^3.0.3"
