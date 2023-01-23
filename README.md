@@ -1,6 +1,6 @@
 # ud
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Macil/ud/blob/master/LICENSE.txt) [![npm version](https://img.shields.io/npm/v/ud.svg?style=flat)](https://www.npmjs.com/package/ud) [![CircleCI Status](https://circleci.com/gh/Macil/ud.svg?style=shield)](https://circleci.com/gh/Macil/ud) [![Greenkeeper badge](https://badges.greenkeeper.io/Macil/ud.svg)](https://greenkeeper.io/)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Macil/ud/blob/master/LICENSE.txt) [![npm version](https://img.shields.io/npm/v/ud.svg?style=flat)](https://www.npmjs.com/package/ud)
 
 Ud is a small set of utilities for updating code live with hot module
 replacement, as supported by
