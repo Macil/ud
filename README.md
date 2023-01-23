@@ -1,6 +1,6 @@
 # ud
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Macil/ud/blob/master/LICENSE.txt) [![npm version](https://img.shields.io/npm/v/ud.svg?style=flat)](https://www.npmjs.com/package/ud)
+[![Node.js CI](https://github.com/Macil/ud/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/Macil/ud/actions/workflows/node.js.yml) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Macil/ud/blob/master/LICENSE.txt) [![npm version](https://img.shields.io/npm/v/ud.svg?style=flat)](https://www.npmjs.com/package/ud)
 
 Ud is a small set of utilities for updating code live with hot module
 replacement, as supported by
