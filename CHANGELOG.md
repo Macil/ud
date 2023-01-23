@@ -1,3 +1,7 @@
+## 3.3.1 (2023-01-23)
+
+* Removed dependency on corejs, which provided polyfills for stuff like WeakMap and other standard JS library features, as it shouldn't be necessary for any even slightly recent browsers. Users targeting very old browsers should bring their own polyfills.
+
 ## 3.3.0 (2018-09-03)
 
 * Added [TypeScript](https://www.typescriptlang.org/) type definitions.
