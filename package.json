@@ -6,7 +6,7 @@
   "types": "index.d.ts",
   "sideEffects": false,
   "scripts": {
-    "prepare": "rimraf js/ && babel -s inline -d js/ src/ && flow-copy-source -v src js && mv -v js/noop.js* ./",
+    "prepare": "rimraf js/ && babel -s true -d js/ src/ && flow-copy-source -v src js && mv -v js/noop.js* ./",
     "test": "yarn run lint && yarn run flow_check && mocha && tsc",
     "flow_check": "flow check",
     "lint": "eslint .",
@@ -52,10 +52,5 @@
     "rimraf": "^4.1.1",
     "sinon": "^7.2.6",
     "typescript": "^4.9.4"
-  },
-  "greenkeeper": {
-    "ignore": [
-      "flow-bin"
-    ]
   }
 }
