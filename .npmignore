@@ -5,4 +5,5 @@ npm-debug.log
 /src
 /test
 /yarn.lock
+/.github
 .babelrc
